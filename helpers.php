@@ -26,18 +26,19 @@ if (!function_exists('mediaExtensionsAvailable')) {
 if (!function_exists('mediaOrganizationPrefix')) {
   function mediaOrganizationPrefix($file = null, $prefix = '', $suffix = '', $organizationId = null, $forced = false)
   {
-    $organizationId = tenant()->id ?? $file->organization_id ?? $organizationId ?? null;
-    $isSingleDataBase = config("tenancy.mode", null) == "singleDatabase";//Check the tenant mode
-    $isDefaultImage = $file
-      && is_object($file->path)
-      && str_contains($file->path->getRelativeUrl(), 'default.jpg');//check if file is default image
-    $isGlobalFile = true;
-    //Check if file has a organizationId
-    if (isset($file->organization_id)) {
-      $isGlobalFile = false;
-    }
-    if (!$organizationId || $isDefaultImage || $isGlobalFile) return "";
-    if ($isSingleDataBase || $forced) return $prefix . config("tenancy.filesystem.suffix_base") . $organizationId . $suffix;
+    if(false) {
+      $organizationId = tenant()->id ?? $file->organization_id ?? $organizationId ?? null;
+      $isSingleDataBase = config("tenancy.mode", null) == "singleDatabase";//Check the tenant mode
+      $isDefaultImage = $file
+        && is_object($file->path)
+        && str_contains($file->path->getRelativeUrl(), 'default.jpg');//check if file is default image
+      $isGlobalFile = true;
+      //Check if file has a organizationId
+      if (isset($file->organization_id)) {
+        $isGlobalFile = false;
+      }
+      if (!$organizationId || $isDefaultImage || $isGlobalFile) return "";
+      if ($isSingleDataBase || $forced) return $prefix . config("tenancy.filesystem.suffix_base") . $organizationId . $suffix;
 
 //    if (
 //      (isset($file->id) && !empty($file->organization_id)) &&
@@ -50,7 +51,7 @@ if (!function_exists('mediaOrganizationPrefix')) {
 //        return $prefix . config("tenancy.filesystem.suffix_base") . $organizationId . $suffix;
 //      }
 //    }
-
+    }
     return '';
   }
 }

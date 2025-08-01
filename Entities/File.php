@@ -55,7 +55,7 @@ class File extends CrudModel implements TaggableInterface, Responsable
   ];
   protected $appends = ['path_string', 'media_type'];
   protected $casts = ['is_folder' => 'boolean'];
-  protected $with = ["tags"];
+  //protected $with = ["tags"];
   protected static $entityNamespace = 'asgardcms/media';
 
     public function parent_folder()
@@ -93,29 +93,26 @@ class File extends CrudModel implements TaggableInterface, Responsable
     {
         return $this->is_folder;
     }
-
   public function isImage()
   {
-
-    $imageExtensions = (array)json_decode(setting('media::allowedImageTypes', null, config("asgard.media.config.allowedImageTypes")));
-
     // Case external disk
     if (isset($this->disk) && !in_array($this->disk, array_keys(config("filesystems.disks")))){
-
+      $imageExtensions = (array)json_decode(setting('media::allowedImageTypes', null, config("asgard.media.config.allowedImageTypes")));
       $dataExternalImg = app("Modules\Media\Services\\" . ucfirst($this->disk) . "Service")->getDataFromUrl($this->path);
       return in_array($dataExternalImg['extension'], $imageExtensions);
-
     }else{
-      return in_array(pathinfo($this->path, PATHINFO_EXTENSION), $imageExtensions);
+      return str_starts_with(($this->mimetype ?? ''), 'image/');
+      //return in_array(pathinfo($this->path, PATHINFO_EXTENSION), $imageExtensions);
     }
-
   }
+
 
 
   public function isVideo()
   {
-    $videoExtensions = json_decode(setting('media::allowedVideoTypes', null, config("asgard.media.config.allowedVideoTypes")));
-    return in_array(pathinfo($this->path, PATHINFO_EXTENSION), $videoExtensions);
+    return str_starts_with(($this->mimetype ?? ''), 'video/');
+    //$videoExtensions = json_decode(setting('media::allowedVideoTypes', null, config("asgard.media.config.allowedVideoTypes")));
+    //return in_array(pathinfo($this->path, PATHINFO_EXTENSION), $videoExtensions);
   }
 
     public function getThumbnail($type)

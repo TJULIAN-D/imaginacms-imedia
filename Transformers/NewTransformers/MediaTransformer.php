@@ -28,9 +28,9 @@ class MediaTransformer extends JsonResource
   {
     parent::__construct($resource);
 
+    $this->params = $params;
     $this->imagy = app(Imagy::class);
     $this->thumbnailManager = app(ThumbnailManager::class);
-    $this->params = $params;
     $this->instancesDefaultUrl();
   }
 
@@ -61,9 +61,9 @@ class MediaTransformer extends JsonResource
       'disk' => $this->disk,
       'extension' => $this->extension,
       'zone' => $this->when(isset($this->pivot->zone) && !empty($this->pivot->zone), $this->pivot->zone ?? null),
-      'url' => $this->url ?? '#',
+      'url' => $filePath,//$this->url ?? '#' [currently is returning the same as path],
       'createdByUser' => isset($this->params["ignoreUser"]) ? null : new UserTransformer($this->whenLoaded('createdBy')),
-      'tags' => $this->tags->pluck('name')->toArray(),
+      'tags' => [] //$this->tags->pluck('name')->toArray(),
     ];
 
     if ($fileToken) {
@@ -74,7 +74,7 @@ class MediaTransformer extends JsonResource
     //Thumbnails
     foreach ($this->thumbnailManager->all() as $thumbnail) {
       $thumbnailName = $thumbnail->name();
-      $thumbnailPath = $this->isImage() ? $this->getValidatedThumbnail($thumbnailName) : $this->defaultUrl;
+      $thumbnailPath = $data['isImage'] ? $this->getValidatedThumbnail($thumbnailName) : $this->defaultUrl;
       if ($fileToken) {
         $thumbnailPath = addQueryParamToUrl($thumbnailPath, 'token', $fileToken);
         $thumbnailPath = addQueryParamToUrl($thumbnailPath, 'originalFileId', $this->id);
@@ -101,6 +101,7 @@ class MediaTransformer extends JsonResource
           $this->translate("$lang")['keywords'] : '';
       }
     }
+
     return $data;
   }
 
